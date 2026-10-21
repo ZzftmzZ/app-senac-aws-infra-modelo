@@ -5,20 +5,20 @@
 # Cria o grupo de segurança de rede (firewall virtual) para o Load Balancer
 resource "aws_security_group" "nlb_sg" {
   # Define o nome legível do Security Group no console da AWS
-  name        = "senac-public-lb-sg"
+  name = "senac-public-lb-sg"
   # Descrição explicativa da finalidade deste Security Group
   description = "Security group para o Load Balancer publico da aplicacao MVC"
   # Associa o Security Group à Virtual Private Cloud (VPC) do projeto
-  vpc_id      = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
 
   # Bloco de regras de entrada (Ingress) - Define quem pode acessar o Load Balancer
   ingress {
     # Porta TCP inicial de escuta da requisição HTTP
-    from_port   = 80
+    from_port = 80
     # Porta TCP final de escuta da requisição HTTP
-    to_port     = 80
+    to_port = 80
     # Protocolo de transporte utilizado na comunicação
-    protocol    = "tcp"
+    protocol = "tcp"
     # Permite acesso irrestrito vindo de qualquer endereço IPv4 da internet mundial
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -26,11 +26,11 @@ resource "aws_security_group" "nlb_sg" {
   # Bloco de regras de saída (Egress) - Define para onde o balanceador pode enviar pacotes
   egress {
     # Permite envio a partir de qualquer porta inicial
-    from_port   = 0
+    from_port = 0
     # Permite envio até qualquer porta final
-    to_port     = 0
+    to_port = 0
     # O valor -1 indica liberação irrestrita de todos os protocolos de rede na saída
-    protocol    = "-1"
+    protocol = "-1"
     # Permite tráfego com destino a qualquer endereço IPv4 (necessário para alcançar os nós)
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -43,15 +43,15 @@ resource "aws_security_group" "nlb_sg" {
 # Provisiona um balanceador de carga de rede na camada 4 voltado para a internet
 resource "aws_lb" "external_lb" {
   # Nome exclusivo atribuído ao balanceador dentro da região
-  name               = "senac-mvc-public-nlb"
+  name = "senac-mvc-public-nlb"
   # Define o balanceador como público (Internet-facing) para acesso via navegador web
-  internal           = false
+  internal = false
   # Especifica o tipo de balanceador de carga como de rede (Network Load Balancer)
   load_balancer_type = "network"
   # Aloca interfaces de rede públicas para o NLB nas subnets públicas da VPC
-  subnets            = module.vpc.public_subnets
+  subnets = module.vpc.public_subnets
   # Vincula o Security Group criado para aplicar as regras de firewall na borda
-  security_groups    = [aws_security_group.nlb_sg.id]
+  security_groups = [aws_security_group.nlb_sg.id]
 
   # Distribui as conexões uniformemente entre nós em diferentes zonas de disponibilidade
   enable_cross_zone_load_balancing = true
@@ -64,26 +64,26 @@ resource "aws_lb" "external_lb" {
 # Cria o grupo de alvos onde o NLB entregará o tráfego recebido da internet
 resource "aws_lb_target_group" "eks_nodes_tg" {
   # Nome de identificação do grupo de alvos
-  name        = "senac-app-tg"
+  name = "senac-app-tg"
   # Porta pública do nó (NodePort) mapeada pelo Service do Kubernetes
-  port        = 30080
+  port = 30080
   # Protocolo de transporte utilizado para falar com as instâncias EC2 dos nós
-  protocol    = "TCP"
+  protocol = "TCP"
   # ID da VPC onde as instâncias EC2 do cluster estão instaladas
-  vpc_id      = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
   # O tipo instance registra diretamente as máquinas virtuais EC2 como membros do grupo
   target_type = "instance"
 
   # Configuração de checagem periódica de saúde (Health Check) das aplicações nos nós
   health_check {
     # Protocolo de checagem de integridade das aplicações
-    protocol            = "TCP"
+    protocol = "TCP"
     # Porta inspecionada em cada servidor EC2 (porta NodePort do Spring Boot)
-    port                = "30080"
+    port = "30080"
     # Intervalo de tempo em segundos entre cada checagem de integridade
-    interval            = 30
+    interval = 30
     # Número de checagens bem-sucedidas consecutivas para considerar a máquina pronta
-    healthy_threshold   = 3
+    healthy_threshold = 3
     # Número de checagens com falha consecutivas para suspender o tráfego para a máquina
     unhealthy_threshold = 3
   }
@@ -92,19 +92,19 @@ resource "aws_lb_target_group" "eks_nodes_tg" {
 # Regra de segurança nos nós EC2 permitindo conexões diretas do Security Group do NLB
 resource "aws_security_group_rule" "eks_nodes_ingress_nodeport_sg" {
   # Define a regra como entrada de pacotes
-  type                     = "ingress"
+  type = "ingress"
   # Porta inicial da liberação
-  from_port                = 30080
+  from_port = 30080
   # Porta final da liberação
-  to_port                  = 30080
+  to_port = 30080
   # Protocolo TCP
-  protocol                 = "tcp"
+  protocol = "tcp"
   # ID do Security Group gerenciado que protege os nós trabalhadores do EKS
-  security_group_id        = module.eks.node_security_group_id
+  security_group_id = module.eks.node_security_group_id
   # Origem permitida: Apenas pacotes que tenham como origem o Security Group do NLB
   source_security_group_id = aws_security_group.nlb_sg.id
   # Descrição descritiva do motivo da regra no painel da AWS
-  description              = "Permite conexoes originadas do NLB na porta NodePort 30080"
+  description = "Permite conexoes originadas do NLB na porta NodePort 30080"
 }
 
 # Conecta automaticamente o Auto Scaling Group gerenciado dos nós ao Target Group do NLB
@@ -112,25 +112,25 @@ resource "aws_autoscaling_attachment" "eks_nodes_tg_attachment" {
   # Obtém dinamicamente o nome do Auto Scaling Group criado pelo módulo do EKS
   autoscaling_group_name = module.eks.eks_managed_node_groups["app_nodes"].node_group_autoscaling_group_names[0]
   # ARN do Target Group onde os servidores serão registrados automaticamente
-  lb_target_group_arn    = aws_lb_target_group.eks_nodes_tg.arn
+  lb_target_group_arn = aws_lb_target_group.eks_nodes_tg.arn
 }
 
 # Libera o tráfego de checagem de saúde e tráfego vindo das subnets públicas do NLB
 resource "aws_security_group_rule" "eks_nodes_ingress_nodeport_cidrs" {
   # Define o tráfego como de entrada nos nós
-  type              = "ingress"
+  type = "ingress"
   # Porta de destino do NodePort
-  from_port         = 30080
+  from_port = 30080
   # Porta de destino do NodePort
-  to_port           = 30080
+  to_port = 30080
   # Protocolo TCP
-  protocol          = "tcp"
+  protocol = "tcp"
   # ID do Security Group dos nós do cluster Kubernetes
   security_group_id = module.eks.node_security_group_id
   # Faixas de IP de origem permitidas: Toda a faixa de subnets públicas onde o NLB reside
-  cidr_blocks       = module.vpc.public_subnets_cidr_blocks
+  cidr_blocks = module.vpc.public_subnets_cidr_blocks
   # Descrição didática da finalidade da regra
-  description       = "Permite health checks e trafego do NLB publico na porta NodePort 30080"
+  description = "Permite health checks e trafego do NLB publico na porta NodePort 30080"
 }
 
 # ==============================================================================
@@ -142,14 +142,14 @@ resource "aws_lb_listener" "nlb_listener" {
   # Vincula este listener ao Network Load Balancer público provisionado
   load_balancer_arn = aws_lb.external_lb.arn
   # Porta de escuta aberta no Load Balancer para o público (porta web HTTP padrão)
-  port              = 80
+  port = 80
   # Protocolo TCP na camada de rede
-  protocol          = "TCP"
+  protocol = "TCP"
 
   # Ação executada pelo Listener no momento em que um pacote web é recebido
   default_action {
     # Encaminha o fluxo de pacotes recebidos
-    type             = "forward"
+    type = "forward"
     # Destino do encaminhamento: O Target Group que entrega aos nós do EKS
     target_group_arn = aws_lb_target_group.eks_nodes_tg.arn
   }
@@ -162,7 +162,7 @@ resource "aws_lb_listener" "nlb_listener" {
 # Saída contendo o endereço DNS público para abrir a aplicação web diretamente no navegador
 output "application_public_url" {
   # Constrói o link completo com o prefixo HTTP e o nome de domínio gerado pelo NLB
-  value       = "http://${aws_lb.external_lb.dns_name}"
+  value = "http://${aws_lb.external_lb.dns_name}"
   # Descrição amigável para o aluno ou desenvolvedor identificar onde acessar
   description = "URL Publica do Load Balancer para acessar a aplicacao MVC Thymeleaf no navegador"
 }

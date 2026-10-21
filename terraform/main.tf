@@ -11,14 +11,14 @@ terraform {
     # Provedor da AWS para gerenciar instâncias, VPCs, EKS, API Gateway, etc.
     aws = {
       # Endereço oficial no Terraform Registry
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
       # Permite atualizações compatíveis dentro da versão principal 5.x (a partir de 5.40)
       version = "~> 5.40"
     }
     # Provedor utilitário Archive para compactar arquivos zip localmente durante o plan/apply
     archive = {
       # Endereço oficial no Terraform Registry
-      source  = "hashicorp/archive"
+      source = "hashicorp/archive"
       # Versão estável do utilitário de compressão de arquivos
       version = "~> 2.4"
     }
@@ -28,13 +28,13 @@ terraform {
   # O Backend remoto garante que o time compartilhe o mesmo estado sem sobrescrever alterações
   backend "s3" {
     # [id-conta] Nome do bucket S3 criado previamente na AWS para persistência do estado
-    bucket       = "tfstate-senac-aws-556890483198"
+    bucket = "tfstate-senac-aws-556890483198"
     # Caminho/chave dentro do bucket onde o arquivo .tfstate ficará guardado
-    key          = "infra/terraform.tfstate"
+    key = "infra/terraform.tfstate"
     # Região onde o bucket S3 de estado foi provisionado
-    region       = "us-east-2"
+    region = "us-east-2"
     # Habilita criptografia em repouso dos dados do estado (Server-Side Encryption)
-    encrypt      = true
+    encrypt = true
     # Habilita mecanismo nativo de trava (lock) para evitar execuções simultâneas concorrentes
     use_lockfile = true
   }
@@ -49,11 +49,11 @@ provider "aws" {
   default_tags {
     tags = {
       # Identificador do projeto de treinamento/laboratório
-      Project     = "App-Senac-AWS"
+      Project = "App-Senac-AWS"
       # Ambiente de execução da aplicação
       Environment = "Production"
       # Ferramenta responsável pelo gerenciamento da infraestrutura como código
-      ManagedBy   = "Terraform"
+      ManagedBy = "Terraform"
     }
   }
 }

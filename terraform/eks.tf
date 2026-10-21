@@ -4,12 +4,12 @@
 # Módulo oficial e homologado para criação e sustentação do cluster EKS
 module "eks" {
   # Origem do módulo no Terraform Registry oficial
-  source  = "terraform-aws-modules/eks/aws"
+  source = "terraform-aws-modules/eks/aws"
   # Versão recomendada do módulo EKS v20
   version = "~> 20.8"
 
   # Nome do cluster referenciando a variável padrão
-  cluster_name    = var.cluster_name
+  cluster_name = var.cluster_name
   # Versão estável do Kubernetes na AWS (v1.31)
   cluster_version = "1.31"
 
@@ -20,7 +20,7 @@ module "eks" {
   enable_irsa = false
 
   # ID da VPC onde os nós de computação e redes do Kubernetes serão inseridos
-  vpc_id     = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
   # Subnets privadas onde as máquinas virtuais EC2 dos nós de trabalho residirão
   subnet_ids = module.vpc.private_subnets
 
@@ -32,14 +32,14 @@ module "eks" {
     # Identificador do grupo de nós que rodarão as aplicações de negócio
     app_nodes = {
       # Nome do Node Group no console da AWS
-      name           = "ng-senac-app"
+      name = "ng-senac-app"
       # Família de instância EC2 balanceada (2 vCPUs e 2GB RAM - custo eficiente para estudos)
       instance_types = ["t3.small"]
 
       # Quantidade mínima de servidores EC2 mantidos ativos pelo Auto Scaling
-      min_size     = 1
+      min_size = 1
       # Quantidade máxima de servidores EC2 permitidos em caso de aumento de carga
-      max_size     = 3
+      max_size = 3
       # Quantidade desejada de servidores em operação normal
       desired_size = 1
 
