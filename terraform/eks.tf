@@ -69,21 +69,21 @@ module "eks" {
     }
 
     # Entrada 2: Concede acesso de Administrador para a Role do GitHub Actions rodar deploys
-    # github_actions = {
-    #   # [id-conta] ARN da IAM Role assumida pelo runner do GitHub Actions via OIDC
-    #   principal_arn = "arn:aws:iam::556890483198:role/GitHubActions-Terraform-Role"
-    #   # Lista de políticas de acesso atribuídas ao pipeline de automação
-    #   policy_associations = {
-    #     # Associação com a política administrativa do cluster
-    #     admin = {
-    #       # Permite que o pipeline execute 'kubectl apply' e gerencie pods, services e deployments
-    #       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-    #       # Escopo total do cluster
-    #       access_scope = {
-    #         type = "cluster"
-    #       }
-    #     }
-    #   }
-    # }
+    github_actions = {
+      # [id-conta] ARN da IAM Role assumida pelo runner do GitHub Actions via OIDC
+      principal_arn = "arn:aws:iam::556890483198:role/GitHubActions-Terraform-Role"
+      # Lista de políticas de acesso atribuídas ao pipeline de automação
+      policy_associations = {
+        # Associação com a política administrativa do cluster
+        admin = {
+          # Permite que o pipeline execute 'kubectl apply' e gerencie pods, services e deployments
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          # Escopo total do cluster
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
   }
 }
