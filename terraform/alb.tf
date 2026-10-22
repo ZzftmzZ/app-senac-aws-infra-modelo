@@ -7,7 +7,7 @@
 
 # Security Group do ALB: aceita HTTP da internet
 resource "aws_security_group" "alb" {
-  name        = "sg-alb-senac-app"
+  name        = "alb-senac-app-sg"
   description = "Permite acesso HTTP publico ao ALB da aplicacao Senac"
   vpc_id      = module.vpc.vpc_id
 
