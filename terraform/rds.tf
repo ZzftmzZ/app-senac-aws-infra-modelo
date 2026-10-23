@@ -16,7 +16,7 @@ resource "aws_db_subnet_group" "mysql" {
 # Firewall do banco: libera a porta 3306 apenas para os nós do EKS
 resource "aws_security_group" "rds" {
   # Nome do security group
-  name = "sg-rds-mysql-senac"
+  name = "rds-mysql-senac-sg"
   # Descrição do propósito
   description = "Permite acesso MySQL somente a partir dos nos do EKS"
   # VPC onde o security group será criado
@@ -32,7 +32,7 @@ resource "aws_security_group" "rds" {
   }
 
   tags = {
-    Name = "sg-rds-mysql-senac"
+    Name = "rds-mysql-senac-sg"
   }
 }
 
